@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+
+# Qualcomm AI Hub Weights & Binaries
+models/*.onnx
+models/*.bin
+models/*.raw
+
+# Database & Runtime Logs
+data/
+*.db
+*.sqlite
+logs/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/

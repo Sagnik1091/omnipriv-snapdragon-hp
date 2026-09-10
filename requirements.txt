@@ -1,0 +1,9 @@
+# Core ARM64 & Qualcomm QNN Dependencies
+onnxruntime-qnn>=1.18.0; platform_machine == 'ARM64'
+numpy>=1.24.3
+sounddevice>=0.4.6
+scipy>=1.11.0
+torch>=2.3.0; platform_machine == 'ARM64'
+transformers>=4.40.0
+rich>=13.7.0
+pydantic>=2.7.0
