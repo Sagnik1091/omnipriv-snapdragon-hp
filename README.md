@@ -1,79 +1,101 @@
-# OmniPriv: Local-First Multimodal Meeting Intelligence Suite
+# OmniPriv
 
-[![Platform: Windows on ARM](https://img.shields.io/badge/Platform-Windows%20on%20ARM64-blue.svg)](https://microsoft.com)
-[![Engine: Qualcomm AI Hub](https://img.shields.io/badge/Engine-Qualcomm%20AI%20Hub-orange.svg)](https://aihub.qualcomm.com)
-[![Hardware: Snapdragon X Elite](https://img.shields.io/badge/Hardware-Snapdragon%20X%20Elite%20%2F%20Plus-red.svg)](https://qualcomm.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+**Proposal-stage reference prototype for the Snapdragon AI Lab Build & Present Challenge**
 
-OmniPriv is an on-device, zero-cloud meeting transcription, indexing, and synthesis suite engineered natively for **Snapdragon-powered HP PCs** (HP OmniBook X, HP EliteBook Ultra). By executing entirely on the **45 TOPS Qualcomm® Hexagon™ NPU**, OmniPriv delivers sub-second speech-to-text, private semantic search, and automated executive minutes without transmitting any data over the network.
+OmniPriv is an offline-first meeting intelligence concept designed for Snapdragon-powered HP PCs. The intended product captures meeting audio, produces local transcripts, retrieves cited discussion segments, and creates structured minutes without requiring a cloud service during meetings.
 
----
+> **Current status:** this repository contains a runnable Python simulation of the proposed workflow. It does **not** yet perform real Whisper/Llama inference, semantic vector search, QNN acceleration, WinUI packaging, or hardware benchmarking. Planned functionality and performance targets are documented separately from completed work.
 
-## Key Features
-- **Zero-Cloud Air-Gapped Privacy:** Operates offline with zero outbound network calls. All vector embeddings and transcripts remain on local BitLocker-encrypted storage.
-- **NPU-Accelerated Audio Processing:** Continuous speech-to-text via INT8 Whisper targeting the Qualcomm Hexagon NPU (<300 ms chunk latency).
-- **Offline Semantic Retrieval (RAG):** Fast vector retrieval across past transcripts powered by FP16 All-MiniLM-L6.
-- **On-Device Meeting Synthesis:** Structured action items, decisional logs, and executive summaries generated via INT4 Llama-3.2-3B running at ~24 tokens/sec on the NPU.
-- **Extended Battery Life:** Reduces CPU power consumption by over 65% compared to CPU-based local AI tools.
+## Why OmniPriv
 
----
+- **Privacy and governance:** local processing can reduce exposure to remote data handling.
+- **Offline resilience:** meeting assistance can remain available when connectivity is limited.
+- **Device efficiency:** Snapdragon X platforms provide a Hexagon NPU intended for efficient on-device AI workloads.
+- **Verifiability:** the proposed product exposes runtime/provider diagnostics rather than relying on unverified acceleration claims.
 
-## System Architecture
+## Intended workflow
 
-```
-[System Audio / Microphone]
-            │
-            ▼
-[Audio Ring Buffer & VAD]
-            │
-            ▼
-[Whisper INT8 on Qualcomm Hexagon NPU] ──> [Streaming Real-Time Transcript]
-            │
-            ▼
-[All-MiniLM-L6-v2 Embeddings] ──────────> [Local SQLite-VSS / HNSW Index]
-            │
-            ▼
-[Llama-3.2-3B INT4 on Hexagon NPU] ─────> [Executive Minutes & Action Items]
+```text
+Microphone / system audio
+        ↓
+Local buffering and preprocessing
+        ↓
+Speech model compiled for a validated local runtime
+        ↓
+Timestamped transcript + local embedding index
+        ↓
+Grounded minutes, action items, and transcript-cited Q&A
 ```
 
----
+## What works today
 
-## Hardware Target & Requirements
-- **Target PC:** HP OmniBook X / HP EliteBook Ultra (Snapdragon X Elite / Snapdragon X Plus)
-- **Operating System:** Windows 11 on ARM (ARM64) Build 22631 or higher
-- **Runtime Dependencies:**
-  - ONNX Runtime with Qualcomm QNN Execution Provider (`QNNExecutionProvider`)
-  - Qualcomm Neural Processing SDK (v2.22+)
-  - Python 3.10+ (ARM64) or packaged native MSIX
+- A runnable, deterministic pipeline simulation.
+- Local SQLite transcript insertion and retrieval.
+- A meeting-minutes output format.
+- Unit tests for storage and simulated summary formatting.
 
----
+## What is not implemented yet
 
-## Quick Start
+- Real microphone-to-ASR integration in the main pipeline.
+- Real ONNX Runtime or QNN execution.
+- Downloaded or compiled Qualcomm AI Hub model artifacts.
+- Embedding generation, HNSW, or vector similarity search.
+- Generative-model inference.
+- WinUI 3 interface or ARM64 MSIX installer.
+- Measured Snapdragon/HP latency, memory, power, or battery results.
 
-### 1. Clone the Repository
+## Run the reference simulation
+
 ```bash
-git clone https://github.com/your-username/omnipriv-snapdragon-hp.git
+git clone https://github.com/Sagnik1091/omnipriv-snapdragon-hp.git
 cd omnipriv-snapdragon-hp
+python -m venv .venv
 ```
 
-### 2. Environment Setup (Windows on ARM)
+Windows PowerShell:
+
 ```powershell
-python -m venv venv
-.\venv\Scripts\activate
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-```
-
-### 3. Fetch Qualcomm AI Hub Pre-Compiled Models
-```powershell
-python scripts/download_hub_models.py
-```
-
-### 4. Run OmniPriv
-```powershell
 python src/main.py
+python -m unittest discover -s tests -v
 ```
 
----
+The console output is explicitly labeled as simulated and should not be interpreted as hardware or AI-model validation.
 
-## License & Ownership
-This project is an original software design solely owned and submitted by the participant for the **Snapdragon HP PC Challenge**. All foundation models are open-source and converted via the Qualcomm AI Hub under permissive open licenses (Apache 2.0 / Llama 3.2 Community License).
+## Proposed target stack
+
+| Stage | Candidate technology | Evidence required before claiming completion |
+|---|---|---|
+| Transcription | Qualcomm AI Hub speech model; ONNX/QNN where supported | Provider allocation, latency, accuracy sample |
+| Retrieval | Compact embedding model plus local vector index | Embedding latency and retrieval relevance |
+| Synthesis | Compact local instruction model | Runtime logs, tokens/sec, memory, grounded-output review |
+| Windows delivery | ARM64 Windows app and MSIX | Repeatable install, accessibility and offline tests |
+
+Candidate model selection is intentionally not locked until licensing, input/output compatibility, and support for the target Snapdragon chipset are verified.
+
+## Engineering targets — not benchmark results
+
+- Transcript update latency: **≤1 second**.
+- Meeting-time processing: **no required outbound connection**.
+- Working memory: **below 4 GB**, subject to final model selection.
+- CPU package-power reduction: **≥30% versus a documented CPU reference path**.
+- Grounding: key summary and Q&A claims link to transcript excerpts.
+
+See [`docs/VALIDATION_PLAN.md`](docs/VALIDATION_PLAN.md) for measurement requirements.
+
+## Roadmap
+
+1. Connect a recorded WAV file to real local transcription.
+2. Compile/profile one supported model and capture QNN/provider evidence.
+3. Add embeddings, local similarity search, and cited retrieval.
+4. Add grounded minutes, action items, and export.
+5. Package and test the validated workflow on Windows on ARM.
+
+## Responsible disclosure of status
+
+The current code is a reference simulation, not a production application. No claim of NPU execution, zero CPU fallback, measured latency, measured power reduction, battery endurance, or model throughput is made until reproducible evidence is published.
+
+## License
+
+Application code is released under the MIT License. Third-party models and runtimes remain subject to their own licenses and distribution requirements.

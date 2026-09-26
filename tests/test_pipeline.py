@@ -17,7 +17,8 @@ class TestOmniPrivPipeline(unittest.TestCase):
     def test_summary_generation(self):
         mock_data = [{"timestamp": "10:00", "speaker": "Bob", "content": "Action item created."}]
         summary = self.summarizer.generate_minutes(mock_data)
-        self.assertIn("Executive Meeting Minutes", summary)
+        self.assertIn("Simulated Meeting Minutes", summary)
+        self.assertIn("No AI model generated this summary", summary)
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,15 +1,15 @@
-"""
-Whisper ASR Inference Module
-Runs INT8 Whisper using ONNX Runtime with Qualcomm QNN Execution Provider.
+"""Proposal-stage transcription interface.
+
+Real ONNX/QNN inference is not implemented in this reference repository.
 """
 import numpy as np
 
 class HexagonTranscriber:
-    def __init__(self, model_path: str = "models/whisper_base_qnn.onnx"):
+    def __init__(self, model_path: str = "models/speech_model.onnx"):
         self.model_path = model_path
-        print("[Transcriber] Initializing Whisper INT8 on Qualcomm Hexagon NPU via QNN EP...")
+        print("[Transcriber] SIMULATION MODE — no AI model or QNN provider is loaded.")
 
     def transcribe_chunk(self, audio_data: np.ndarray) -> str:
         if audio_data is None or len(audio_data) == 0:
             return ""
-        return "Team discussed Q3 roadmap deliverables, security compliance on HP PCs, and Hexagon NPU offloading."
+        return "[SIMULATED TRANSCRIPT] Replace this stub with validated local ASR inference."

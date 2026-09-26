@@ -1,47 +1,25 @@
-"""
-Model Downloader & Qualcomm AI Hub Model Verification
-"""
-import os
+"""Print the model-provisioning checklist.
 
-MODELS = {
-    "whisper_base_int8": {
-        "repo": "qualcomm/whisper-base-int8-onnx",
-        "filename": "whisper_base_qnn.onnx",
-        "description": "Quantized INT8 Automatic Speech Recognition for Hexagon NPU"
-    },
-    "all_minilm_l6_fp16": {
-        "repo": "qualcomm/all-minilm-l6-v2-fp16",
-        "filename": "all_minilm_l6_fp16.onnx",
-        "description": "Semantic Embedding Engine for local vector indexing"
-    },
-    "llama3_2_3b_int4": {
-        "repo": "qualcomm/llama-3.2-3b-instruct-int4-awq",
-        "filename": "llama_3.2_3b_qnn.onnx",
-        "description": "Quantized INT4 Reasoning & Synthesis model for Hexagon NPU"
-    }
-}
+This script intentionally does not create fake .onnx files. Qualcomm AI Hub model
+selection, licensing, export, and target-device compatibility must be verified
+before model artifacts are provisioned.
+"""
+from pathlib import Path
+
+CANDIDATES = [
+    ("Speech recognition", "Select a Qualcomm AI Hub speech model supported on the target chipset."),
+    ("Embeddings", "Select a compact sentence-embedding model and validate the intended runtime."),
+    ("Synthesis", "Select a compact instruction model that fits the memory and license constraints."),
+]
 
 def main():
-    target_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "models"))
-    os.makedirs(target_dir, exist_ok=True)
-    print("=" * 60)
-    print("OmniPriv - Qualcomm AI Hub Model Provisioning Tool")
-    print(f"Target Directory: {target_dir}")
-    print("=" * 60)
-
-    for key, info in MODELS.items():
-        dest = os.path.join(target_dir, info["filename"])
-        print(f"\n[+] Checking: {key}")
-        print(f"    Description: {info['description']}")
-        print(f"    Target File: {dest}")
-        if not os.path.exists(dest):
-            with open(dest, "w") as f:
-                f.write(f"# Placeholder for Qualcomm AI Hub Compiled Model: {key}\n")
-            print("    [OK] Model manifest ready for QNN EP.")
-        else:
-            print("    [OK] Verified existing.")
-
-    print("\nAll Qualcomm AI Hub models verified.")
+    model_dir = Path(__file__).resolve().parents[1] / "models"
+    print("OmniPriv model-provisioning checklist")
+    print(f"Planned local model directory: {model_dir}")
+    for name, requirement in CANDIDATES:
+        print(f"- {name}: {requirement}")
+    print("\nNo model files were downloaded or generated.")
+    print("Record model URL, version, license, checksum, compile target, and provider logs before use.")
 
 if __name__ == "__main__":
     main()
